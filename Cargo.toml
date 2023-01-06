@@ -1,0 +1,10 @@
+[package]
+name = "sql-to-yaml"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+linear-map = { version = "1.2.0", features = ["serde", "serde_impl"] }
+serde = { version = "1.0.152", features = ["derive"] }
+serde_yaml = "0.9.16"
+sqlparser = "0.30.0"
