@@ -36,17 +36,18 @@ impl Serialize for PropertyType {
 impl PropertyType {
     fn from_mysql_column_definition(input_str: &str) -> Result<Self, ()> {
         let upper_input = input_str.to_ascii_uppercase();
-        if upper_input == "TINYINT(1)" {
-            return Ok(Self::Boolean);
-        } else if upper_input.starts_with("INT") {
-            return Ok(Self::Integer);
-        } else if upper_input.starts_with("VARCHAR") || upper_input.ends_with("TEXT") {
-            return Ok(Self::String);
-        } else if upper_input.starts_with("DECIMAL") || upper_input.starts_with("FLOAT") {
-            return Ok(Self::Number);
-        }
 
-        Err(())
+        if upper_input == "TINYINT(1)" {
+            Ok(Self::Boolean)
+        } else if upper_input.starts_with("INT") || upper_input.starts_with("BIGINT") || upper_input.starts_with("TINYINT") || upper_input.starts_with("SMALLINT") {
+            Ok(Self::Integer)
+        } else if upper_input.starts_with("DECIMAL") || upper_input.starts_with("FLOAT") {
+            Ok(Self::Number)
+        } else if upper_input.starts_with("VARCHAR") || upper_input.ends_with("TEXT") || upper_input.contains("DATE") || upper_input.contains("TIME") {
+            Ok(Self::String)
+        } else {
+            Err(())
+        }
     }
 }
 
@@ -86,6 +87,15 @@ fn prompt_for_sql() -> String {
 }
 
 fn main() {
+    // let sql = "\
+    // CREATE TABLE Persons (\
+    //     PersonID int,\
+    //     LastName varchar(255) null,\
+    //     FirstName varchar(255) not null,\
+    //     Address varchar(255),\
+    //     City varchar(255)\
+    // );";
+
     let sql = prompt_for_sql();
 
     let dialect = MySqlDialect {};
@@ -144,5 +154,6 @@ fn main() {
     }
 
     let yaml = serde_yaml::to_string(&props).expect("Serialization error");
+    println!("\n\n");
     println!("{}", yaml);
 }
